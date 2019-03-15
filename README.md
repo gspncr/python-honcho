@@ -1,5 +1,5 @@
 # python-honcho
-Python endpoint to kill, bounce, and start processes.
+Python endpoint to kill, bounce, and start processes. Based on PSUtil: http://psutil.readthedocs.io
 
 ## kill a process:
 `/kill/<process>`
