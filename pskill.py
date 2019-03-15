@@ -16,7 +16,7 @@ def kill(pname):
     return jsonify("process killed: "+pname)
 
 @app.route('/mac/bounce/<pname>')
-def bounce(pname):
+def macBounce(pname):
     for proc in psutil.process_iter():
         if proc.name() == pname:
             proc.kill()
@@ -26,7 +26,7 @@ def bounce(pname):
     return jsonify("process bounced: "+pname)
 
 @app.route('/bounce/<pname>')
-def macBounce(pname):
+def bounce(pname):
     for proc in psutil.process_iter():
         if proc.name() == pname:
             proc.kill()
