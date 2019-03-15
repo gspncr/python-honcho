@@ -1,7 +1,17 @@
-# python-killer
-Python endpoint to kill a process
+# python-honcho
+Python endpoint to kill, bounce, and start processes.
 
-## usage
-this will listen on the port you define. To kill a process send a GET request to /kill/<processname>. A JSON will be returned to confirm process killed.
-  
-Based on psutil for cross platform support: https://psutil.readthedocs.io/en/latest/
+## kill a process:
+`/kill/<process>`
+
+## bounce a process:
+`/bounce/<process>`
+
+## start a process:
+`/start/<process>`
+
+## mac bounce a process
+`/mac/bounce/<process>`
+
+## mac start a process
+`/mac/start/<process>`
