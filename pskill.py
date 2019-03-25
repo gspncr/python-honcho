@@ -1,7 +1,8 @@
 import psutil
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import subprocess
 import time
+import urllib
 
 app = Flask(__name__)
 app.debug = True
@@ -14,13 +15,28 @@ def procsByName():
     for proc in psutil.process_iter():
        try:
            pinfo = proc.as_dict(attrs=['pid', 'name', 'username'])
-           pinfo['vms'] = proc.memory_info().vms / (1024 * 1024)
+           pinfo['virtual-memory'] = proc.memory_info().vms / (1024 * 1024)
+           pinfo['stop-command'] = request.url_root+'kill/'+pinfo['name']
+           pinfo['start-command'] = request.url_root+'startExperimental/'+pinfo['name']
+           pinfo['restart-command'] = request.url_root+'bounce/'+pinfo['name']
            listOfProcObjects.append(pinfo);
        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
            pass
 
-    listOfProcObjects = sorted(listOfProcObjects, key=lambda procObj: procObj['vms'], reverse=True)
+    listOfProcObjects = sorted(listOfProcObjects, key=lambda procObj: procObj['virtual-memory'], reverse=True)
     return jsonify(listOfProcObjects)
+
+@app.route('/startExperimental/<pname>')
+def startExperimental(pname):
+    try:
+        subprocess.call([pname])
+    except Exception:
+        pass
+    try:
+        subprocess.call(["/usr/bin/open", "-n", "-a", "/Applications/"+pname+".app"])
+    except Exception:
+        pass
+    return jsonify("process started: "+pname)
 
 @app.route('/kill/<pname>')
 def kill(pname):
@@ -42,12 +58,24 @@ def macBounce(pname):
 
 @app.route('/bounce/<pname>')
 def bounce(pname):
-    for proc in psutil.process_iter():
-        if proc.name() == pname:
-            proc.kill()
-    #subprocess.run(["Spotify"])
-    time.sleep(5)
-    subprocess.call([pname])
+    try:
+        for proc in psutil.process_iter():
+            if proc.name() == pname:
+                proc.kill()
+        #subprocess.run(["Spotify"])
+        time.sleep(5)
+        subprocess.call([pname])
+    except Exception:
+        pass
+    try:
+        for proc in psutil.process_iter():
+            if proc.name() == pname:
+                proc.kill()
+        #subprocess.run(["Spotify"])
+        time.sleep(5)
+        subprocess.call(["/usr/bin/open", "-n", "-a", "/Applications/"+pname+".app"])
+    except Exception:
+        pass
     return jsonify("process bounced: "+pname)
 
 @app.route('/start/<pname>')
