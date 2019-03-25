@@ -7,6 +7,21 @@ app = Flask(__name__)
 app.debug = True
 #PROCNAME = "Spotify"
 
+@app.route('/processes')
+def procsByName():
+    listOfProcObjects = []
+
+    for proc in psutil.process_iter():
+       try:
+           pinfo = proc.as_dict(attrs=['pid', 'name', 'username'])
+           pinfo['vms'] = proc.memory_info().vms / (1024 * 1024)
+           listOfProcObjects.append(pinfo);
+       except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+           pass
+
+    listOfProcObjects = sorted(listOfProcObjects, key=lambda procObj: procObj['vms'], reverse=True)
+    return jsonify(listOfProcObjects)
+
 @app.route('/kill/<pname>')
 def kill(pname):
     for proc in psutil.process_iter():
