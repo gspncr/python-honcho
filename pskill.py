@@ -3,6 +3,7 @@ from flask import Flask, jsonify, request
 import subprocess
 import time
 import urllib
+import os
 
 app = Flask(__name__)
 app.debug = True
@@ -87,5 +88,10 @@ def start(pname):
 def macStart(pname):
     subprocess.call(["/usr/bin/open", "-n", "-a", "/Applications/"+pname+".app"])
     return jsonify("process started: "+pname)
+
+@app.route('/iis')
+def iis():
+    os.system('iisreset /restart')
+    return jsonify("iisreset completed")
 
 app.run(host='0.0.0.0', port=8080)
