@@ -25,3 +25,6 @@ _Now has experimental support for all OS's_
 
 ## mac start a process
 `/mac/start/<process>`
+
+## restart IIS
+`/iis`
